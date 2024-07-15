@@ -1,4 +1,4 @@
-package jdev_mentoria_lojavirtual.model;
+package jdev.mentoria.lojavirtual.model;
 
 import java.io.Serializable;
 

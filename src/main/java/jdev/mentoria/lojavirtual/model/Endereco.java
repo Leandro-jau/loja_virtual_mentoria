@@ -1,9 +1,11 @@
-package jdev_mentoria_lojavirtual.model;
+package jdev.mentoria.lojavirtual.model;
 
 import java.io.Serializable;
 
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import jdev.mentoria.lojavirtual.enums.TipoEndereco;
 
 @Entity
 @Table(name = "endereco")
@@ -31,12 +35,25 @@ public class Endereco implements Serializable {
 	private String bairro;
 	private String uf;
 	private String cidade;
-	
-	
+
+
 	//a coluna "pessoa_id" será a chave estrangeira que irá relacionar a entidade atual com a entidade que possui a coluna "id" correspondente que no caso esta na classe Pessoa.java\tabela Pessoa
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "pessoa_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "pessoa_fk"))
 	private Pessoa pessoa;
+
+	//mapeamos ele usando jpa, ele esta mapeado com o enum criado na "classe" TipoEndereco.java
+	@Enumerated(EnumType.STRING) //ele é do tipo string
+	private TipoEndereco tipoEndereco; //ai o jpa vai trabalhar com essas descrições aquiCOBRANCA("Cobrança"),
+	                                   //ENTREGA("Entrega") para gravar no banco;
+
+	public void setTipoEndereco(TipoEndereco tipoEndereco) {
+		this.tipoEndereco = tipoEndereco;
+	}
+
+	public TipoEndereco getTipoEndereco() {
+		return tipoEndereco;
+	}
 
 	public Long getId() {
 		return id;
@@ -120,18 +137,20 @@ public class Endereco implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		}
 		Endereco other = (Endereco) obj;
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 

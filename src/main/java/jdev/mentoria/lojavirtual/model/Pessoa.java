@@ -1,4 +1,4 @@
-package jdev_mentoria_lojavirtual.model;
+package jdev.mentoria.lojavirtual.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,16 +36,16 @@ public abstract class Pessoa implements Serializable {
 	private String email;
 
 	private String telefone;
-	
+
 	//esse "pessoa" que esta aqui: mappedBy = "pessoa" se refere a esse codigo: private Pessoa pessoa que esta na classe Endereço.java
 	//se apagar uma pessoa vai apagar os endereços
 	//fetch = FetchType.LAZY só vai carregar os endereço se nós dermos um getendereço
 	@OneToMany(mappedBy = "pessoa", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Endereco> enderecos = new ArrayList<Endereco>(); //agente ja instancia para não gerar o erro de nullpointexception
-		
+	private List<Endereco> enderecos = new ArrayList<>(); //agente ja instancia para não gerar o erro de nullpointexception
+
 	public void setEnderecos(List<Endereco> enderecos) {
 		this.enderecos = enderecos;	}
-	
+
 	public List<Endereco> getEnderecos() {
 		return enderecos;
 	}
@@ -92,18 +92,20 @@ public abstract class Pessoa implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		}
 		Pessoa other = (Pessoa) obj;
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 

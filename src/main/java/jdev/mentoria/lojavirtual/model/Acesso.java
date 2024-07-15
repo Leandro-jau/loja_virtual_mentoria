@@ -1,4 +1,4 @@
-package jdev_mentoria_lojavirtual.model;
+package jdev.mentoria.lojavirtual.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -56,18 +56,20 @@ public class Acesso implements GrantedAuthority { //estamos usando o spring secu
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		}
 		Acesso other = (Acesso) obj;
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 
