@@ -53,7 +53,7 @@ public class Usuario implements UserDetails {
 	joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", //apontamos as colunas para suas tabelas, o campo usuario_id eu posso repetir por isso que é unique = false pois eu posso cadastrar varios acessos para o mesmo usuario eu posso repetir o codigo de usuario nessa tabela usuario_acesso pois posso ter 5 tipos de acesso para o usuario 1 então por isso que é false o parametro unique
 	unique = false, foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)), //foreignKey = @ForeignKey colocamos o nome da chave estrangeira pois senão ele vai criar uma nome muito estranho
 	//até agora a parte de cima é da tabela usuario, usuario_acesso apontando para usuario
-	inverseJoinColumns = @JoinColumn(name = "acesso_id", unique = false, referencedColumnName = "id", table = "acesso", //acesso_id é como se fosse da tabela usuario_acesso o unique ta como fasle senão vai restringir, referenciamos a tabela acesso campo id
+	inverseJoinColumns = @JoinColumn(name = "acesso_id", unique = false, referencedColumnName = "id", table = "acesso", //acesso_id é como se fosse da tabela usuario_acesso o unique ta como fasle senão vai restringir, referenciamos a tabela acesso campo id - no banco criou assim ONSTRAINT uk_8bak9jswon2id2jbunuqlfl9e UNIQUE (acesso_id) não podemos deixar assim senão não vamos conseguir cadastrar 2 administradores
 	foreignKey = @ForeignKey(name = "aesso_fk", value = ConstraintMode.CONSTRAINT))) //foreignKey é um atributo do javax
 	private List<Acesso> acessos;
 	
