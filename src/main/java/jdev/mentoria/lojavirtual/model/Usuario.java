@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -41,6 +42,11 @@ public class Usuario implements UserDetails {
 	@Temporal(TemporalType.DATE)//@Temporal é do pacote javax que é uma evolução do java
 	private Date dataAtualSenha;
 	
+	@ManyToOne(targetEntity = Pessoa.class)
+	@JoinColumn(name = "pessoa_id", nullable = false, 
+	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "pessoa_fk"))
+	private Pessoa pessoa;
+	
 	//O usuario tem uma lista de acessos se vermos o diagrama de classes conseguimos ver 3 tabelas
 	//Usuario, Usuario_Acesso e Acesso, conseguimos ver a cardinalidade de muitos para muitos
 	//por isso gerou "3 tabelas" mas não vamos criar a tabela do meio  Usuario_Acesso, o spring 
@@ -56,6 +62,14 @@ public class Usuario implements UserDetails {
 	inverseJoinColumns = @JoinColumn(name = "acesso_id", unique = false, referencedColumnName = "id", table = "acesso", //acesso_id é como se fosse da tabela usuario_acesso o unique ta como fasle senão vai restringir, referenciamos a tabela acesso campo id - no banco criou assim ONSTRAINT uk_8bak9jswon2id2jbunuqlfl9e UNIQUE (acesso_id) não podemos deixar assim senão não vamos conseguir cadastrar 2 administradores
 	foreignKey = @ForeignKey(name = "aesso_fk", value = ConstraintMode.CONSTRAINT))) //foreignKey é um atributo do javax
 	private List<Acesso> acessos;
+	
+	public void setPessoa(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+	
+	public Pessoa getPessoa() {
+		return pessoa;
+	}
 	
 
 	/*Autoridades = São os acesso, ou seja ROLE_ADMIN, ROLE_SECRETARIO, ROLE_FINACEIRO*/

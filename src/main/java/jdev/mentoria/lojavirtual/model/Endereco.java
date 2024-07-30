@@ -2,6 +2,7 @@ package jdev.mentoria.lojavirtual.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -28,12 +29,25 @@ public class Endereco implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_endereco")
 	private Long id;
 
+	@Column(nullable = false)
 	private String ruaLogra;
+	
+	@Column(nullable = false)
 	private String cep;
+	
+	@Column(nullable = false)
 	private String numero;
+	
+	
 	private String complemento;
+	
+	@Column(nullable = false)
 	private String bairro;
+	
+	@Column(nullable = false)
 	private String uf;
+	
+	@Column(nullable = false)
 	private String cidade;
 
 
@@ -43,6 +57,7 @@ public class Endereco implements Serializable {
 	private Pessoa pessoa;
 
 	//mapeamos ele usando jpa, ele esta mapeado com o enum criado na "classe" TipoEndereco.java
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING) //ele é do tipo string
 	private TipoEndereco tipoEndereco; //ai o jpa vai trabalhar com essas descrições aquiCOBRANCA("Cobrança"),
 	                                   //ENTREGA("Entrega") para gravar no banco;
