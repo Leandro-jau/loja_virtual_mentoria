@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -35,10 +36,13 @@ public class Usuario implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_usuario")
 	private Long id;
 	
+	@Column(nullable = false)	
 	private String login;
 	
+	@Column(nullable = false)
 	private String senha;
 	
+	@Column(nullable = false)
 	@Temporal(TemporalType.DATE)//@Temporal é do pacote javax que é uma evolução do java
 	private Date dataAtualSenha;
 	
