@@ -5,7 +5,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jdev.mentoria.lojavirtual.LojaVirtualMentoriaApplication;
@@ -61,21 +64,146 @@ class LojaVirtualMentoriaApplicationTests extends TestCase { //TestCse é uma cl
 	    						 .accept(MediaType.APPLICATION_JSON) //tipo de dados que nossa api trabalha
 	    						 .contentType(MediaType.APPLICATION_JSON)); //tipo de conteudo
 	    
-	    //1System.out.println("Retorno da API: " + retornoApi.andReturn().getResponse().getContentAsString());
+	    System.out.println("Retorno da API: " + retornoApi.andReturn().getResponse().getContentAsString()); //só para ver o json é o retorno da resposta em string
 	    
-	    /*Conveter o retorno da API para um obejto de acesso*/
+	    /*vamos trabalhar o retornoAPI etõ precisamos Conveter o retorno da API para um obejto de acesso porque ele salva e retorna um objeto, isso porque na classe acessocontroller o metodo public ResponseEntity<Acesso> retorna um json return new ResponseEntity<Acesso>(acessoSalvo, HttpStatus.OK);*/
 	    
-	    //1Acesso objetoRetorno = objectMapper.
-	    //1					   readValue(retornoApi.andReturn().getResponse().getContentAsString(),
-	    //1					   Acesso.class);  //<groupId>com.fasterxml.jackson.jaxrs</groupId> = pom.xml
+	    Acesso objetoRetorno = objectMapper.
+	    					   readValue(retornoApi.andReturn().getResponse().getContentAsString(), //essa é a mesma linha de codigo acima explicada
+	    					   Acesso.class);  //<groupId>com.fasterxml.jackson.jaxrs</groupId> = pom.xml  Acesso.class é o tipo da classe
 	    
-	    //1assertEquals(acesso.getDescricao(), objetoRetorno.getDescricao());
+	    assertEquals(acesso.getDescricao(), objetoRetorno.getDescricao()); //agora esses dois devem ter o mesmo valor
 	    
 	    
 	    
 	    
 	}
 	
+	@Test
+	public void testRestApiDeleteAcesso() throws JsonProcessingException, Exception {
+		
+	    DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup(this.wac);
+	    MockMvc mockMvc = builder.build();
+	    
+	    Acesso acesso = new Acesso();
+	    
+	    acesso.setDescricao("ROLE_TESTE_DELETE");
+	    
+	    acesso = acessoRepository.save(acesso);
+	    
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    
+	    ResultActions retornoApi = mockMvc
+	    						 .perform(MockMvcRequestBuilders.post("/deleteAcesso")
+	    						 .content(objectMapper.writeValueAsString(acesso))
+	    						 .accept(MediaType.APPLICATION_JSON)
+	    						 .contentType(MediaType.APPLICATION_JSON));
+	    //ele vai trazer esse retorno da classe acessocontroller.java return new ResponseEntity("Acesso Removido",HttpStatus.OK);
+	    System.out.println("Retorno da API: " + retornoApi.andReturn().getResponse().getContentAsString());// esse é isso HttpStatus.OK da classse acessocontroller
+	    System.out.println("Status de retorno: " + retornoApi.andReturn().getResponse().getStatus());
+	    
+	    assertEquals("Acesso Removido", retornoApi.andReturn().getResponse().getContentAsString());
+	    assertEquals(200, retornoApi.andReturn().getResponse().getStatus());//outro teste codigo 200 é quando a resposta é feita com sucesso
+	    
+	    
+	}
+	
+	@Test
+	public void testRestApiDeletePorIDAcesso() throws JsonProcessingException, Exception {
+		
+	    DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup(this.wac);
+	    MockMvc mockMvc = builder.build();
+	    
+	    Acesso acesso = new Acesso();
+	    
+	    acesso.setDescricao("ROLE_TESTE_DELETE_ID");
+	    
+	    acesso = acessoRepository.save(acesso);
+	    
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    
+	    ResultActions retornoApi = mockMvc
+	    						 .perform(MockMvcRequestBuilders.delete("/deleteAcessoPorId/" + acesso.getId())
+	    						 .content(objectMapper.writeValueAsString(acesso))
+	    						 .accept(MediaType.APPLICATION_JSON)
+	    						 .contentType(MediaType.APPLICATION_JSON));
+	    
+	    System.out.println("Retorno da API: " + retornoApi.andReturn().getResponse().getContentAsString());
+	    System.out.println("Status de retorno: " + retornoApi.andReturn().getResponse().getStatus());
+	    
+	    assertEquals("Acesso Removido", retornoApi.andReturn().getResponse().getContentAsString());
+	    assertEquals(200, retornoApi.andReturn().getResponse().getStatus());
+	    
+	    
+	}
+	
+	@Test
+	public void testRestApiObterAcessoID() throws JsonProcessingException, Exception {
+		
+	    DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup(this.wac);
+	    MockMvc mockMvc = builder.build();
+	    
+	    Acesso acesso = new Acesso();
+	    
+	    acesso.setDescricao("ROLE_OBTER_ID"); //mudamos os nomes só para ver no console a descrição do que estou testando
+	    
+	    acesso = acessoRepository.save(acesso);
+	    
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    
+	    ResultActions retornoApi = mockMvc
+	    						 .perform(MockMvcRequestBuilders.get("/obterAcesso/" + acesso.getId()) //agora mudamos o verbo para get
+	    						 .content(objectMapper.writeValueAsString(acesso))
+	    						 .accept(MediaType.APPLICATION_JSON)
+	    						 .contentType(MediaType.APPLICATION_JSON));
+	    
+	    assertEquals(200, retornoApi.andReturn().getResponse().getStatus());
+	    
+	    //getResponse() = pegamos a resposta da API -- readValue RETORNA UM OBJETO GENERICO por isso passamos o tipo dele  Acesso.class
+	    Acesso acessoRetorno = objectMapper.readValue(retornoApi.andReturn().getResponse().getContentAsString(), Acesso.class); //Acesso.class = ele retorna um tipo generico por isso passamos esse tipo transformamos ele em uma classe de acesso
+	    
+	    assertEquals(acesso.getDescricao(), acessoRetorno.getDescricao());
+	    
+	    assertEquals(acesso.getId(), acessoRetorno.getId());
+	    
+	}
+	
+	@Test
+	public void testRestApiObterAcessoDesc() throws JsonProcessingException, Exception {
+		
+	    DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup(this.wac);
+	    MockMvc mockMvc = builder.build();
+	    
+	    Acesso acesso = new Acesso();
+	    
+	    acesso.setDescricao("ROLE_TESTE_OBTER_LIST");
+	    
+	    acesso = acessoRepository.save(acesso);
+	    
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    
+	    ResultActions retornoApi = mockMvc //**aqui estamos buscando 
+	    						 .perform(MockMvcRequestBuilders.get("/buscarPorDesc/OBTER_LIST") //aqui estamos passando uma parte do que esta sendo salvo
+	    						 .content(objectMapper.writeValueAsString(acesso))
+	    						 .accept(MediaType.APPLICATION_JSON)
+	    						 .contentType(MediaType.APPLICATION_JSON));
+	    
+	    assertEquals(200, retornoApi.andReturn().getResponse().getStatus());
+	    
+	    
+	    List<Acesso> retornoApiList = objectMapper. //**aqui estamos convertendo para uma lista
+	    							     readValue(retornoApi.andReturn()
+	    									.getResponse().getContentAsString(),
+	    									 new TypeReference<List<Acesso>> () {});
+	    //nesse teste é 1 porque sabemos que estamos setando apenas 1 no banco
+	    assertEquals(1, retornoApiList.size());
+	    
+	    assertEquals(acesso.getDescricao(), retornoApiList.get(0).getDescricao()); //pegamos na posição 0;
+	    
+	    
+	    acessoRepository.deleteById(acesso.getId());
+	    
+	}
 	
 
 	@Test

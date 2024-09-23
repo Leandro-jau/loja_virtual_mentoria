@@ -53,11 +53,14 @@ public class Usuario implements UserDetails {
 	
 	//O usuario tem uma lista de acessos se vermos o diagrama de classes conseguimos ver 3 tabelas
 	//Usuario, Usuario_Acesso e Acesso, conseguimos ver a cardinalidade de muitos para muitos
-	//por isso gerou "3 tabelas" mas não vamos criar a tabela do meio  Usuario_Acesso, o spring 
+	//por isso gerou "3 tabelas" mas não vamos criar a tabela do meio  Usuario_Acesso, essa anotação: @JoinTable cria a tabela o spring 
 	//vai criar essa tabela associativa através das anotações, quando o usuario fazer o login
 	//ele vai usar essa lista que estamos criando.
+	//com toda essas anotações complexas é para controlar o acesso de um usuario, por exemplo o suario acesso
+	//vamos poder colocar que ele vai ter o acesso de administrador e de secretario é para isso que criamos
+	//essa tabela usuarios_acesso
 	//private List<Acesso> acessos; esse <Acesso> é a classe Acesso.java
-	@OneToMany(fetch = FetchType.LAZY) //daqui para baixo é a parte complexa onde criamos a terceira tabela, @OneToMany é do pacote javax.persistence quando falamos javax é springdata e jpa, FetchType.LAZY para carregar os acessos só para quando precisar
+	@OneToMany(fetch = FetchType.EAGER) //daqui para baixo é a parte complexa onde criamos a terceira tabela, @OneToMany é do pacote javax.persistence quando falamos javax é springdata e jpa, FetchType.LAZY para carregar os acessos só para quando precisar
 	@JoinTable(name = "usuarios_acesso", uniqueConstraints = @UniqueConstraint (columnNames = {"usuario_id", "acesso_id"} , //é aqui que criamos a terceira tabela, aqui criamos ela name = "usuarios_acesso" isso porque temos muitos para muitos então criamos uma tabela associativa, criamos as colunas com uniqueConstraints, com isso @UniqueConstraint (columnNames = {"usuario_id", "acesso_id"} não vamos ter cadastro repetido
 	 name = "unique_acesso_user"), //é um nome para esse conjunto columnNames = {"usuario_id", "acesso_id"}
 	joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", //apontamos as colunas para suas tabelas, o campo usuario_id eu posso repetir por isso que é unique = false pois eu posso cadastrar varios acessos para o mesmo usuario eu posso repetir o codigo de usuario nessa tabela usuario_acesso pois posso ter 5 tipos de acesso para o usuario 1 então por isso que é false o parametro unique
@@ -74,6 +77,50 @@ public class Usuario implements UserDetails {
 	public Pessoa getPessoa() {
 		return pessoa;
 	}
+	
+	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getLogin() {
+		return login;
+	}
+
+	public void setLogin(String login) {
+		this.login = login;
+	}
+
+	public String getSenha() {
+		return senha;
+	}
+
+	public void setSenha(String senha) {
+		this.senha = senha;
+	}
+
+	public Date getDataAtualSenha() {
+		return dataAtualSenha;
+	}
+
+	public void setDataAtualSenha(Date dataAtualSenha) {
+		this.dataAtualSenha = dataAtualSenha;
+	}
+
+	public List<Acesso> getAcessos() {
+		return acessos;
+	}
+
+	public void setAcessos(List<Acesso> acessos) {
+		this.acessos = acessos;
+	}
+	
+	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	
 
 	/*Autoridades = São os acesso, ou seja ROLE_ADMIN, ROLE_SECRETARIO, ROLE_FINACEIRO*/

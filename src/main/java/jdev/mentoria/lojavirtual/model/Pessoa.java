@@ -40,12 +40,24 @@ public abstract class Pessoa implements Serializable {
 
 	@Column(nullable = false)
 	private String telefone;
+	
+	@Column
+	private String tipoPessoa;
 
 	//esse "pessoa" que esta aqui: mappedBy = "pessoa" se refere a esse codigo: private Pessoa pessoa que esta na classe Endereço.java
 	//se apagar uma pessoa vai apagar os endereços
 	//fetch = FetchType.LAZY só vai carregar os endereço se nós dermos um getendereço
 	@OneToMany(mappedBy = "pessoa", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Endereco> enderecos = new ArrayList<>(); //agente ja instancia para não gerar o erro de nullpointexception
+	
+	public void setTipoPessoa(String tipoPessoa) {
+		this.tipoPessoa = tipoPessoa;
+	}
+	
+	public String getTipoPessoa() {
+		return tipoPessoa;
+	}
+	
 
 	public void setEnderecos(List<Endereco> enderecos) {
 		this.enderecos = enderecos;	}
