@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import jdev.mentoria.lojavirtual.ExceptionMentoriaJava;
 import jdev.mentoria.lojavirtual.model.Acesso;
 import jdev.mentoria.lojavirtual.repository.AcessoRepository;
 import jdev.mentoria.lojavirtual.service.AcessoService;
@@ -29,8 +30,19 @@ public class AcessoController {
 	private AcessoRepository acessoRepository;
 	
 	@ResponseBody /*Poder dar um retorno a API */
+	//@RequestMapping em alguns lugares pode estar usando isso no lugar de PostMapping vai ser a mesma coisa
 	@PostMapping(value = "**/salvarAcesso") /*Mapeando a url para receber JSON usamos ** para ignorar localhost:8080projeto etc... de qualquerlugar quevier osalvarAcesso ele vai interceptar*/
-	public ResponseEntity<Acesso> salvarAcesso(@RequestBody Acesso acesso) { /*Recebe o JSON e converte pra Objeto, ResponseEntity<Acesso> = vai ser uma resposta do tipo acesso*/
+	public ResponseEntity<Acesso> salvarAcesso(@RequestBody Acesso acesso) throws ExceptionMentoriaJava { /*Recebe o JSON e converte pra Objeto, ResponseEntity<Acesso> = vai ser uma resposta do tipo acesso*/
+		
+		//se tiver salvando um novo registro agente vai consultar no banco para saber se ja existe algum acesso com a mesma descição e damos o alerta
+		if (acesso.getId() == null) {
+			  //buscamos no banco
+			  List<Acesso> acessos = acessoRepository.buscarAcessoDesc(acesso.getDescricao().toUpperCase());
+			  //se acessos diferente de vazio
+			  if (!acessos.isEmpty()) {
+				  throw new ExceptionMentoriaJava("Já existe Acesso com a descrição: " + acesso.getDescricao());
+			  }
+			}
 		
 		Acesso acessoSalvo = acessoService.save(acesso);
 		
@@ -69,18 +81,26 @@ public class AcessoController {
 	
 	@ResponseBody
 	@GetMapping(value = "**/obterAcesso/{id}")
-	public ResponseEntity<Acesso> obterAcesso(@PathVariable("id") Long id) { 
+	public ResponseEntity<Acesso> obterAcesso(@PathVariable("id") Long id) throws ExceptionMentoriaJava { 
 		
-		Acesso acesso = acessoRepository.findById(id).get();
+		//Acesso acesso = acessoRepository.findById(id).get(); era ssim com o get depois que criamos a classe ExceptionMentoriaJava, ficou igual ao codigo abaixo
+		Acesso acesso = acessoRepository.findById(id).orElse(null);//se ele nao encontrar vou passar nulo
+		
+		if (acesso == null) {
+			//quando uso throw eu jogo o a mensagem de erro pra cima
+			throw new ExceptionMentoriaJava("Não encontrou Acesso com código: " + id);
+		}
 		
 		return new ResponseEntity<Acesso>(acesso,HttpStatus.OK);
+		
+		
 	}
 	
 	@ResponseBody
 	@GetMapping(value = "**/buscarPorDesc/{desc}")
 	public ResponseEntity<List<Acesso>> buscarPorDesc(@PathVariable("desc") String desc) { 
-		
-		List<Acesso> acesso = acessoRepository.buscarAcessoDesc(desc);
+		//para nao ter problema com caractere maiusculo/minusculo usamos o toUpperCase()
+		List<Acesso> acesso = acessoRepository.buscarAcessoDesc(desc.toUpperCase());
 		
 		return new ResponseEntity<List<Acesso>>(acesso,HttpStatus.OK);
 	}

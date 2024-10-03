@@ -61,6 +61,21 @@ public class Endereco implements Serializable {
 	@Enumerated(EnumType.STRING) //ele é do tipo string
 	private TipoEndereco tipoEndereco; //ai o jpa vai trabalhar com essas descrições aquiCOBRANCA("Cobrança"),
 	                                   //ENTREGA("Entrega") para gravar no banco;
+	
+	@ManyToOne(targetEntity = Pessoa.class)
+	@JoinColumn(name = "empresa_id", nullable = false, 
+	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_id_fk"))
+	private Pessoa empresa;
+	
+	
+
+	public Pessoa getEmpresa() {
+		return empresa;
+	}
+
+	public void setEmpresa(Pessoa empresa) {
+		this.empresa = empresa;
+	}
 
 	public void setTipoEndereco(TipoEndereco tipoEndereco) {
 		this.tipoEndereco = tipoEndereco;

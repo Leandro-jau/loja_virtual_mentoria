@@ -16,10 +16,12 @@ import org.springframework.web.filter.GenericFilterBean;
 /*Filtro onde todas as requisicoes serão capturadas para autenticar, ess classe junta tudo que vir e retornar vai passar por esse filtro*/
 public class JwtApiAutenticacaoFilter extends GenericFilterBean {
 
-	
+	//Esse filter intercepta todas as requisições
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		
+		try { //é o unico lugar que vamos usar o try catch
 		
 		/*Estabele a autenticao do user, aqui ele vai tentar obter a autenticação se esta ou nao*/		
 		Authentication authentication = new JWTTokenAutenticacaoService().
@@ -34,6 +36,14 @@ public class JwtApiAutenticacaoFilter extends GenericFilterBean {
 		
 		//chain é para ele continuar a requisição para chamar a api ou bloquear
 		chain.doFilter(request, response);
+		
+		} catch (Exception e) { //qualquer exceção que não conseguimos tratar vai pegar aqui
+			
+			e.printStackTrace();
+			//esse erro vai acontecer por exemplo se alterarmos o nome da coluna do banco ou algum outro erro de sql de banco de dados
+			response.getWriter().write("Ocorreu um erro no sistema, avise o administrador: \n" + e.getMessage());
+		}
+		
 		
 	}
 	

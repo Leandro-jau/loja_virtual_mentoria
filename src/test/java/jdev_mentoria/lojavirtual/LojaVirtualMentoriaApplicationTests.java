@@ -1,5 +1,6 @@
 package jdev_mentoria.lojavirtual;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jdev.mentoria.lojavirtual.ExceptionMentoriaJava;
 import jdev.mentoria.lojavirtual.LojaVirtualMentoriaApplication;
 import jdev.mentoria.lojavirtual.controller.AcessoController;
 import jdev.mentoria.lojavirtual.model.Acesso;
@@ -54,7 +56,7 @@ class LojaVirtualMentoriaApplicationTests extends TestCase { //TestCse é uma cl
 	    									//esses objetos acima que vão ser os responsavei por fazer os testes trazer requisição e vão dar o retorno para nós
 	    Acesso acesso = new Acesso();
 	    
-	    acesso.setDescricao("ROLE_COMPRADOR");
+	    acesso.setDescricao("ROLE_COMPRADOR" + Calendar.getInstance().getTimeInMillis());
 	    
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    
@@ -207,11 +209,13 @@ class LojaVirtualMentoriaApplicationTests extends TestCase { //TestCse é uma cl
 	
 
 	@Test
-	public void testCadastroAcesso() {
+	public void testCadastroAcesso() throws ExceptionMentoriaJava {
 		
-		Acesso acesso = new Acesso();
+		String descacesso = "ROLE_ADMIN" +  Calendar.getInstance().getTimeInMillis();
 		
-		acesso.setDescricao("ROLE_ADMIN");
+		Acesso acesso = new Acesso();			
+		
+		acesso.setDescricao(descacesso);
 
 		/*Gravou no banco de dados*/
 		acesso = acessoController.salvarAcesso(acesso).getBody(); 
@@ -219,7 +223,7 @@ class LojaVirtualMentoriaApplicationTests extends TestCase { //TestCse é uma cl
 		assertEquals(true, acesso.getId() > 0);
 		
 		/*Validar dados salvos da forma correta*/
-		assertEquals("ROLE_ADMIN", acesso.getDescricao());
+		assertEquals(descacesso, acesso.getDescricao());
 		
 		/*Teste de carregamento*/		
 		Acesso acesso2 = acessoRepository.findById(acesso.getId()).get();
