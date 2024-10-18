@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Profile;
 import jdev.mentoria.lojavirtual.ExceptionMentoriaJava;
 import jdev.mentoria.lojavirtual.LojaVirtualMentoriaApplication;
 import jdev.mentoria.lojavirtual.controller.PessoaController;
+import jdev.mentoria.lojavirtual.enums.TipoEndereco;
+import jdev.mentoria.lojavirtual.model.Endereco;
 import jdev.mentoria.lojavirtual.model.PessoaJuridica;
 import jdev.mentoria.lojavirtual.repository.PessoaRepository;
 import jdev.mentoria.lojavirtual.service.PessoaUserService;
@@ -29,14 +31,56 @@ public class TestePessoaUsuario extends TestCase {
 		PessoaJuridica pessoaJuridica = new PessoaJuridica();
 		pessoaJuridica.setCnpj("" + Calendar.getInstance().getTimeInMillis());
 		pessoaJuridica.setNome("Alex fernando");
-		pessoaJuridica.setEmail("testesalvarpj@gmail.com");
+		pessoaJuridica.setEmail("testesalddddvarpj2@gmail.com");
 		pessoaJuridica.setTelefone("45999795800");
 		pessoaJuridica.setInscEstadual("65556565656665");
 		pessoaJuridica.setInscMunicipal("55554565656565");
 		pessoaJuridica.setNomeFantasia("54556565665");
 		pessoaJuridica.setRazaoSocial("4656656566");
 		
-		pessoaController.salvarPj(pessoaJuridica);
+		Endereco endereco1 = new Endereco();
+		endereco1.setBairro("Jd Dias2");
+		endereco1.setCep("556556565");
+		endereco1.setComplemento("Casa branca");
+		endereco1.setEmpresa(pessoaJuridica);
+		endereco1.setNumero("389");
+		endereco1.setPessoa(pessoaJuridica);
+		endereco1.setRuaLogra("Av. são joao sexto");
+		endereco1.setTipoEndereco(TipoEndereco.COBRANCA);
+		endereco1.setUf("PR");
+		endereco1.setCidade("Curitiba");
+		
+		
+		Endereco endereco2 = new Endereco();
+		endereco2.setBairro("Jd Maracana2");
+		endereco2.setCep("7878778");
+		endereco2.setComplemento("Andar 5");
+		endereco2.setEmpresa(pessoaJuridica);
+		endereco2.setNumero("555");
+		endereco2.setPessoa(pessoaJuridica);
+		endereco2.setRuaLogra("Av. maringá");
+		endereco2.setTipoEndereco(TipoEndereco.ENTREGA);
+		endereco2.setUf("PR");
+		endereco2.setCidade("Curitiba");
+		
+		pessoaJuridica.getEnderecos().add(endereco2);
+		pessoaJuridica.getEnderecos().add(endereco1);
+		
+		//pessoaController.salvarPj(pessoaJuridica);
+		
+		//Podemos fazer validações
+		pessoaJuridica = pessoaController.salvarPj(pessoaJuridica).getBody();
+		
+		//se existe no banco
+		assertEquals(true, pessoaJuridica.getId() > 0 );
+		
+		//se foi gerado primarykey para ele
+		for (Endereco endereco : pessoaJuridica.getEnderecos()) {
+			assertEquals(true, endereco.getId() > 0);
+		}
+		
+		//testamos se veio 2 endereços
+		assertEquals(2, pessoaJuridica.getEnderecos().size());
 		
 		
 		

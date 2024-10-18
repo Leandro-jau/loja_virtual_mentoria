@@ -16,6 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jdev.mentoria.lojavirtual.enums.TipoEndereco;
 
 @Entity
@@ -52,6 +54,7 @@ public class Endereco implements Serializable {
 
 
 	//a coluna "pessoa_id" será a chave estrangeira que irá relacionar a entidade atual com a entidade que possui a coluna "id" correspondente que no caso esta na classe Pessoa.java\tabela Pessoa
+	@JsonIgnore
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "pessoa_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "pessoa_fk"))
 	private Pessoa pessoa;
@@ -62,13 +65,13 @@ public class Endereco implements Serializable {
 	private TipoEndereco tipoEndereco; //ai o jpa vai trabalhar com essas descrições aquiCOBRANCA("Cobrança"),
 	                                   //ENTREGA("Entrega") para gravar no banco;
 	
+	@JsonIgnore
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "empresa_id", nullable = false, 
 	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_id_fk"))
 	private Pessoa empresa;
 	
 	
-
 	public Pessoa getEmpresa() {
 		return empresa;
 	}

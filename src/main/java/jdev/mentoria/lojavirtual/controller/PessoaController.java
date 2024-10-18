@@ -39,6 +39,7 @@ public class PessoaController {
 		//pessoaJuridica = pessoaRepository.salvar
 		pessoaJuridica = pessoaUserService.salvarPessoaJuridica(pessoaJuridica);
 		
+		//aqui quando ele retorna ele gera um json
 		return new ResponseEntity<PessoaJuridica>(pessoaJuridica, HttpStatus.OK);
 	}
 
