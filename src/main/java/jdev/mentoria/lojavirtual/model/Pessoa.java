@@ -19,6 +19,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 //Essa classe pessoa é uma abstração, nós nunca vamos trabalhar direto com o objeto pessoa,
 //nós vamos trabalhar com clases concretas como pessoa juridica e pessoa fisica, conforme
@@ -35,10 +39,15 @@ public abstract class Pessoa implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_pessoa")
 	private Long id;
-
+	
+	
+	@Size(min = 4, message = "O nome deve ter no minimo 4 letras")
+	@NotBlank(message = "Nome deve ser informado")
+	@NotNull(message = "Nome deve ser informado")
 	@Column(nullable = false)
 	private String nome;
-
+	
+	@Email
 	@Column(nullable = false)
 	private String email;
 
