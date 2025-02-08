@@ -31,7 +31,7 @@ public class CategoriaProduto implements Serializable {
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "empresa_id", nullable = false, 
 	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_id_fk"))
-	private PessoaJuridica empresa = new PessoaJuridica();  //professor alterou isso aqui
+	private PessoaJuridica empresa = new PessoaJuridica();  
 	
 		
 

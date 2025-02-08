@@ -24,6 +24,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 //Essa classe pessoa é uma abstração, nós nunca vamos trabalhar direto com o objeto pessoa,
 //nós vamos trabalhar com clases concretas como pessoa juridica e pessoa fisica, conforme
 //esta no diagrama de classes //não vamos ter a tabela fisicamente de pessoa no banco de dados
@@ -62,6 +64,7 @@ public abstract class Pessoa implements Serializable {
 	//fetch = FetchType.LAZY só vai carregar os endereço se nós dermos um getendereço
 	@OneToMany(mappedBy = "pessoa", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Endereco> enderecos = new ArrayList<>(); //agente ja instancia para não gerar o erro de nullpointexception
+	
 	
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "empresa_id", nullable = true, 
