@@ -1,5 +1,6 @@
 package jdev.mentoria.lojavirtual.controller;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,6 +190,59 @@ public class Vd_Cp_loja_Virt_Controller {
 		return new ResponseEntity<String>("Venda ativada com sucesso!.",HttpStatus.OK);
 		
 	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/consultaVendaDinamicaFaixaData/{data1}/{data2}")
+	public ResponseEntity<List<VendaCompraLojaVirtualDTO>> 
+	                            consultaVendaDinamicaFaixaData(
+	                            		@PathVariable("data1") String data1,
+	                            		@PathVariable("data2") String data2) throws ParseException{
+		
+		//estamos instanciando uma lista como null essa lista vai ser atribuida vai vir do sql
+		List<VendaCompraLojaVirtual> compraLojaVirtual = null;
+		
+		compraLojaVirtual = vendaService.consultaVendaFaixaData(data1, data2);
+		
+		//se a lista continuar nula agente implementa ela, agente cria ela para não dar null point exception
+		if (compraLojaVirtual == null) {
+			compraLojaVirtual = new ArrayList<VendaCompraLojaVirtual>();
+		}
+		
+		
+		//agora percorrremos a lista de dados, criamos os dto com os valores que vamos retornar para a tela
+         List<VendaCompraLojaVirtualDTO> compraLojaVirtualDTOList = new ArrayList<VendaCompraLojaVirtualDTO>();
+		
+		for (VendaCompraLojaVirtual vcl : compraLojaVirtual) {
+			
+			VendaCompraLojaVirtualDTO compraLojaVirtualDTO = new VendaCompraLojaVirtualDTO();
+	
+			compraLojaVirtualDTO.setValorTotal(vcl.getValorTotal());
+			compraLojaVirtualDTO.setPessoa(vcl.getPessoa());
+	
+			compraLojaVirtualDTO.setEntrega(vcl.getEnderecoEntrega());
+			compraLojaVirtualDTO.setCobranca(vcl.getEnderecoCobranca());
+	
+			compraLojaVirtualDTO.setValorDesc(vcl.getValorDesconto());
+			compraLojaVirtualDTO.setValorFrete(vcl.getValorFret());
+			compraLojaVirtualDTO.setId(vcl.getId());
+
+			for (ItemVendaLoja item : vcl.getItemVendaLojas()) {
+	
+				ItemVendaDTO itemVendaDTO = new ItemVendaDTO();
+				itemVendaDTO.setQuantidade(item.getQuantidade());
+				itemVendaDTO.setProduto(item.getProduto());
+	
+				compraLojaVirtualDTO.getItemVendaLoja().add(itemVendaDTO);
+			}
+			
+			compraLojaVirtualDTOList.add(compraLojaVirtualDTO);
+		
+		}
+
+		return new ResponseEntity<List<VendaCompraLojaVirtualDTO>>(compraLojaVirtualDTOList, HttpStatus.OK);
+		
+	}
+
 	
 	
 	@ResponseBody

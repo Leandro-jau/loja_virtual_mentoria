@@ -1,11 +1,22 @@
 package jdev.mentoria.lojavirtual.service;
 
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import jdev.mentoria.lojavirtual.model.VendaCompraLojaVirtual;
+
 @Service
 public class VendaService {
+	
+	@PersistenceContext
+	private EntityManager entityManager;
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -33,6 +44,19 @@ public class VendaService {
 	public void ativaRegistroVendaBanco(Long idVenda) {
 		String sql = "begin; update vd_cp_loja_virt set excluido = false where id = " + idVenda +"; commit;";
 		jdbcTemplate.execute(sql);;
+		
+	}
+	
+	/*HQL (Hibernate) ou JPQL (JPA ou Spring Data)*/
+	@SuppressWarnings("unchecked")
+	public List<VendaCompraLojaVirtual> consultaVendaFaixaData(String data1, String data2){
+		
+		String sql = "select distinct(i.vendaCompraLojaVirtual) from ItemVendaLoja i "
+				+ " where i.vendaCompraLojaVirtual.excluido = false "
+				+ " and i.vendaCompraLojaVirtual.dataVenda >= '" + data1 + "'"
+				+ " and i.vendaCompraLojaVirtual.dataVenda <= '" + data2 + "'";
+		
+		return entityManager.createQuery(sql).getResultList();
 		
 	}
 	
