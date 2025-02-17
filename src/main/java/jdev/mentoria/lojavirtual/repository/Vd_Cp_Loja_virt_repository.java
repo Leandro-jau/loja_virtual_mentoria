@@ -1,5 +1,6 @@
 package jdev.mentoria.lojavirtual.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,10 +24,23 @@ public interface Vd_Cp_Loja_virt_repository extends JpaRepository<VendaCompraLoj
 	@Query(value="select distinct(i.vendaCompraLojaVirtual) from ItemVendaLoja i "
 			+ " where i.vendaCompraLojaVirtual.excluido = false and upper(trim(i.produto.nome)) like %?1%")
 	List<VendaCompraLojaVirtual> vendaPorNomeProduto(String valor);
+	
+	//esse método vai mostrar o rastreio pelo cliente
+	@Query(value="select distinct(i.vendaCompraLojaVirtual) from ItemVendaLoja i "
+			+ " where i.vendaCompraLojaVirtual.excluido = false and i.vendaCompraLojaVirtual.pessoa.id = ?1")
+	List<VendaCompraLojaVirtual> vendaPorCliente(Long idCliente);
 
 	@Query(value="select distinct(i.vendaCompraLojaVirtual) from ItemVendaLoja i "
 			+ " where i.vendaCompraLojaVirtual.excluido = false and upper(trim(i.vendaCompraLojaVirtual.pessoa.nome)) like %?1%")
 	List<VendaCompraLojaVirtual> vendaPorNomeCliente(String nomepessoa);
+	
+	@Query(value="select distinct(i.vendaCompraLojaVirtual) from ItemVendaLoja i "
+			+ " where i.vendaCompraLojaVirtual.excluido = false and upper(trim(i.vendaCompraLojaVirtual.pessoa.cpf)) like %?1%")
+	List<VendaCompraLojaVirtual> vendaPorCpfClienteLike(String cpf);	
+	
+	@Query(value="select distinct(i.vendaCompraLojaVirtual) from ItemVendaLoja i "
+			+ " where i.vendaCompraLojaVirtual.excluido = false and upper(trim(i.vendaCompraLojaVirtual.pessoa.cpf)) = ?1")
+	List<VendaCompraLojaVirtual> vendaPorCpfClienteIgual(String cpf);
 
 	@Query(value="select distinct(i.vendaCompraLojaVirtual) from ItemVendaLoja i "
 			+ " where i.vendaCompraLojaVirtual.excluido = false and upper(trim(i.vendaCompraLojaVirtual.enderecoCobranca.ruaLogra)) "
@@ -38,5 +52,11 @@ public interface Vd_Cp_Loja_virt_repository extends JpaRepository<VendaCompraLoj
 			+ " where i.vendaCompraLojaVirtual.excluido = false and upper(trim(i.vendaCompraLojaVirtual.enderecoEntrega.ruaLogra)) "
 			+ " like %?1%")
 	List<VendaCompraLojaVirtual> vendaPorEnderecoEntrega(String enderecoentrega);
+	
+	@Query(value="select distinct(i.vendaCompraLojaVirtual) from ItemVendaLoja i "
+			+ " where i.vendaCompraLojaVirtual.excluido = false "
+			+ " and i.vendaCompraLojaVirtual.dataVenda >= ?1 "
+			+ " and i.vendaCompraLojaVirtual.dataVenda <= ?2 ")
+	List<VendaCompraLojaVirtual> consultaVendaFaixaData(Date data1, Date data2);
 
 }
