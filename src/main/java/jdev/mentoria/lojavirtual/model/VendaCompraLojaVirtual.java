@@ -29,6 +29,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "vd_cp_loja_virt")
@@ -67,6 +68,7 @@ public class VendaCompraLojaVirtual implements Serializable {
 	@JoinColumn(name = "forma_pagamento_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "forma_pagamento_fk"))
 	private FormaPagamento formaPagamento;
 	
+	@JsonManagedReference  //***************************Isso não tem no projeto do professor************************
 	@JsonIgnoreProperties(allowGetters = true)
 	@NotNull(message = "A nota fiscal deve ser informada")
 	@OneToOne(cascade = CascadeType.ALL)

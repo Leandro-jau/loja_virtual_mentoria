@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Profile;
 
 import jdev.mentoria.lojavirtual.ExceptionMentoriaJava;
 import jdev.mentoria.lojavirtual.LojaVirtualMentoriaApplication;
+import jdev.mentoria.lojavirtual.controller.CupDescontoController;
+import jdev.mentoria.lojavirtual.controller.FormaPagamentoController;
 import jdev.mentoria.lojavirtual.controller.PessoaController;
 import jdev.mentoria.lojavirtual.enums.TipoEndereco;
 import jdev.mentoria.lojavirtual.model.Endereco;
@@ -22,12 +24,29 @@ import junit.framework.TestCase;
 @SpringBootTest(classes = LojaVirtualMentoriaApplication.class)
 public class TestePessoaUsuario extends TestCase {
 	
+	@Autowired
+	private FormaPagamentoController formaPagamentoController;
 	
 	@Autowired
 	private PessoaController pessoaController;	
 	
 	@Autowired
 	private PessoaRepository pesssoaRepository;
+	
+	@Autowired
+	private CupDescontoController cupDescontoController;
+	
+	@Test
+	public void testCupDesconto() {
+		cupDescontoController.listaCupomDesc();
+		cupDescontoController.listaCupomDesc(1L);
+	}
+	
+	
+	@Test public void testFormaPagamento() {
+	formaPagamentoController.listaFormaPagamento();
+	formaPagamentoController.listaFormaPagamentoidEmpresa(1L); }
+	 
 	
 	@Test
 	public void testCadPessoaJuridica() throws ExceptionMentoriaJava {
@@ -89,7 +108,7 @@ public class TestePessoaUsuario extends TestCase {
 		
 
 		PessoaFisica pessoaFisica = new PessoaFisica();
-		pessoaFisica.setCpf("136.734.180-92");
+		pessoaFisica.setCpf("197.684.840-71");
 		pessoaFisica.setNome("Alex fernando");
 		pessoaFisica.setEmail("alex.fe85544141nando.egidio@gmail.com");
 		pessoaFisica.setTelefone("45999795800");

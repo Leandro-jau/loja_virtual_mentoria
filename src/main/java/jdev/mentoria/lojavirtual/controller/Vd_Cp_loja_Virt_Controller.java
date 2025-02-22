@@ -1,9 +1,12 @@
 package jdev.mentoria.lojavirtual.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import jdev.mentoria.lojavirtual.ExceptionMentoriaJava;
+import jdev.mentoria.lojavirtual.enums.StatusContaReceber;
+import jdev.mentoria.lojavirtual.model.ContaReceber;
 import jdev.mentoria.lojavirtual.model.Endereco;
 import jdev.mentoria.lojavirtual.model.ItemVendaLoja;
 import jdev.mentoria.lojavirtual.model.PessoaFisica;
@@ -27,10 +32,12 @@ import jdev.mentoria.lojavirtual.model.StatusRastreio;
 import jdev.mentoria.lojavirtual.model.VendaCompraLojaVirtual;
 import jdev.mentoria.lojavirtual.model.dto.ItemVendaDTO;
 import jdev.mentoria.lojavirtual.model.dto.VendaCompraLojaVirtualDTO;
+import jdev.mentoria.lojavirtual.repository.ContaReceberRepository;
 import jdev.mentoria.lojavirtual.repository.EnderecoRepository;
 import jdev.mentoria.lojavirtual.repository.NotaFiscalVendaRepository;
 import jdev.mentoria.lojavirtual.repository.StatusRastreioRepository;
 import jdev.mentoria.lojavirtual.repository.Vd_Cp_Loja_virt_repository;
+import jdev.mentoria.lojavirtual.service.ServiceSendEmail;
 import jdev.mentoria.lojavirtual.service.VendaService;
 
 @RestController
@@ -54,9 +61,15 @@ public class Vd_Cp_loja_Virt_Controller {
 	@Autowired
 	private VendaService vendaService;
 	
+	@Autowired
+	private ContaReceberRepository contaReceberRepository;
+	
+	@Autowired
+	private ServiceSendEmail serviceSendEmail;
+	
 	@ResponseBody
 	@PostMapping(value = "**/salvarVendaLoja")
-	public ResponseEntity<VendaCompraLojaVirtualDTO> salvarVendaLoja(@RequestBody @Valid VendaCompraLojaVirtual vendaCompraLojaVirtual) throws ExceptionMentoriaJava{
+	public ResponseEntity<VendaCompraLojaVirtualDTO> salvarVendaLoja(@RequestBody @Valid VendaCompraLojaVirtual vendaCompraLojaVirtual) throws ExceptionMentoriaJava, UnsupportedEncodingException, MessagingException{
 		
 		vendaCompraLojaVirtual.getPessoa().setEmpresa(vendaCompraLojaVirtual.getEmpresa());
 		PessoaFisica pessoaFisica = pessoaController.salvarPf(vendaCompraLojaVirtual.getPessoa()).getBody();
@@ -118,6 +131,31 @@ public class Vd_Cp_loja_Virt_Controller {
 
 			compraLojaVirtualDTO.getItemVendaLoja().add(itemVendaDTO);
 		}
+		
+		ContaReceber contaReceber = new ContaReceber();
+		contaReceber.setDescricao("Venda da loja virtual nº: " + vendaCompraLojaVirtual.getId());
+		contaReceber.setDtPagamento(Calendar.getInstance().getTime());
+		contaReceber.setDtVencimento(Calendar.getInstance().getTime());
+		contaReceber.setEmpresa(vendaCompraLojaVirtual.getEmpresa());
+		contaReceber.setPessoa(vendaCompraLojaVirtual.getPessoa());
+		contaReceber.setStatus(StatusContaReceber.QUITADA);
+		contaReceber.setValorDesconto(vendaCompraLojaVirtual.getValorDesconto());
+		contaReceber.setValorTotal(vendaCompraLojaVirtual.getValorTotal());
+		
+		contaReceberRepository.saveAndFlush(contaReceber);
+		
+		/*Emil para o comprador*/
+		StringBuilder msgemail = new StringBuilder();
+		msgemail.append("Olá, ").append(pessoaFisica.getNome()).append("</br>");//enviando email para o cliente
+		msgemail.append("Você realizou a compra de nº: ").append(vendaCompraLojaVirtual.getId()).append("</br>");
+		msgemail.append("Na loja ").append(vendaCompraLojaVirtual.getEmpresa().getNomeFantasia());
+		/*assunto, msg, destino*/
+		serviceSendEmail.enviarEmailHtml("Compra Realizada", msgemail.toString(), pessoaFisica.getEmail());
+		
+		/*Email para o vendedor*/
+		msgemail = new StringBuilder();
+		msgemail.append("Você realizou uma venda, nº " ).append(vendaCompraLojaVirtual.getId());
+		serviceSendEmail.enviarEmailHtml("Venda Realizada", msgemail.toString(), vendaCompraLojaVirtual.getEmpresa().getEmail());
 		
 		return new ResponseEntity<VendaCompraLojaVirtualDTO>(compraLojaVirtualDTO, HttpStatus.OK);
 	}
@@ -305,6 +343,50 @@ public class Vd_Cp_loja_Virt_Controller {
 
 		return new ResponseEntity<List<VendaCompraLojaVirtualDTO>>(compraLojaVirtualDTOList, HttpStatus.OK);
 	}
+	
+	
+	@ResponseBody
+	@GetMapping(value = "**/vendaPorCliente/{idCliente}")
+	public ResponseEntity<List<VendaCompraLojaVirtualDTO>> vendaPorCliente(@PathVariable("idCliente") Long idCliente) {
+
+		List<VendaCompraLojaVirtual> compraLojaVirtual = vd_Cp_Loja_virt_repository.vendaPorCliente(idCliente);
+		
+		if (compraLojaVirtual == null) {
+			compraLojaVirtual = new ArrayList<VendaCompraLojaVirtual>();
+		}
+		
+		List<VendaCompraLojaVirtualDTO> compraLojaVirtualDTOList = new ArrayList<VendaCompraLojaVirtualDTO>();
+		
+		for (VendaCompraLojaVirtual vcl : compraLojaVirtual) {
+			
+			VendaCompraLojaVirtualDTO compraLojaVirtualDTO = new VendaCompraLojaVirtualDTO();
+	
+			compraLojaVirtualDTO.setValorTotal(vcl.getValorTotal());
+			compraLojaVirtualDTO.setPessoa(vcl.getPessoa());
+	
+			compraLojaVirtualDTO.setEntrega(vcl.getEnderecoEntrega());
+			compraLojaVirtualDTO.setCobranca(vcl.getEnderecoCobranca());
+	
+			compraLojaVirtualDTO.setValorDesc(vcl.getValorDesconto());
+			compraLojaVirtualDTO.setValorFrete(vcl.getValorFret());
+			compraLojaVirtualDTO.setId(vcl.getId());
+
+			for (ItemVendaLoja item : vcl.getItemVendaLojas()) {
+	
+				ItemVendaDTO itemVendaDTO = new ItemVendaDTO();
+				itemVendaDTO.setQuantidade(item.getQuantidade());
+				itemVendaDTO.setProduto(item.getProduto());
+	
+				compraLojaVirtualDTO.getItemVendaLoja().add(itemVendaDTO);
+			}
+			
+			compraLojaVirtualDTOList.add(compraLojaVirtualDTO);
+		
+		}
+
+		return new ResponseEntity<List<VendaCompraLojaVirtualDTO>>(compraLojaVirtualDTOList, HttpStatus.OK);
+	}
+	
 
 	
 	@ResponseBody
