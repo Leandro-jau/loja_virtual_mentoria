@@ -21,6 +21,7 @@ import jdev.mentoria.lojavirtual.model.NotaFiscalCompra;
 import jdev.mentoria.lojavirtual.model.NotaFiscalVenda;
 import jdev.mentoria.lojavirtual.model.dto.ObejtoRequisicaoRelatorioProdCompraNotaFiscalDTO;
 import jdev.mentoria.lojavirtual.model.dto.ObejtoRequisicaoRelatorioProdutoAlertaEstoque;
+import jdev.mentoria.lojavirtual.model.dto.ObjetoRelatorioStatusCompra;
 import jdev.mentoria.lojavirtual.repository.NotaFiscalCompraRepository;
 import jdev.mentoria.lojavirtual.repository.NotaFiscalVendaRepository;
 import jdev.mentoria.lojavirtual.service.NotaFiscalCompraService;
@@ -37,6 +38,19 @@ public class NotaFiscalCompraController {
 	
 	@Autowired
 	private NotaFiscalCompraService notaFiscalCompraService;
+	
+	@ResponseBody           //como é uma api requisição em jackson em json agente precisa do requestbody para ele pegar o json que vai receber e injetar
+	@PostMapping(value = "**/relatorioStatusCompra")   //para validar os campos obrigatorios
+	public ResponseEntity<List<ObjetoRelatorioStatusCompra>> relatorioStatusCompra (@Valid 
+			             @RequestBody  ObjetoRelatorioStatusCompra objetoRelatorioStatusCompra){
+		
+		List<ObjetoRelatorioStatusCompra> retorno = new ArrayList<ObjetoRelatorioStatusCompra>();
+		
+		retorno = notaFiscalCompraService.relatorioStatusVendaLojaVirtual(objetoRelatorioStatusCompra);
+		
+		return new ResponseEntity<List<ObjetoRelatorioStatusCompra>>(retorno, HttpStatus.OK);
+		
+	}
 	
 	@ResponseBody
 	@PostMapping(value = "**/relatorioProdCompradoNotaFiscal")
